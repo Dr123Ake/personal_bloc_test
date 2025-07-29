@@ -9,7 +9,6 @@
   <g transform="translate(400,200)">
     <text text-anchor="middle" fill="white" font-family="Arial" font-size="24">
       <tspan x="0" y="0">默认文章封面</tspan>
-      <tspan x="0" y="30" font-size="16">点击上传自定义图片</tspan>
     </text>
   </g>
 </svg>

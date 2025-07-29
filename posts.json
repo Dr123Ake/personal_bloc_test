@@ -4,6 +4,7 @@
       "id": "mdk110hfygcvm8pnbz",
       "title": "123",
       "content": "1234",
+      "cover": "assets/scene1.jpg",
       "tags": [
         "1",
         "2ai"
@@ -14,6 +15,7 @@
       "id": 1,
       "title": "示例博客文章",
       "content": "这是一篇示例博客文章的内容。",
+      "cover": "assets/scene2.jpg",
       "date": "2024-01-17",
       "tags": [
         "示例",
@@ -24,6 +26,7 @@
       "id": 2,
       "title": "示例博客文章2",
       "content": "这是一篇示例博客文章2的内容。",
+      "cover": "assets/scene3.jpg",
       "date": "2024-01-18",
       "tags": [
         "示例",
@@ -34,6 +37,7 @@
       "id": 3,
       "title": "示例博客文章3",
       "content": "这是一篇示例博客文章3的内容。",
+      "cover": "assets/scene1.jpg",
       "date": "2024-01-19",
       "tags": [
         "示例",
