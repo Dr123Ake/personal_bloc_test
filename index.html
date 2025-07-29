@@ -5,11 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的博客</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>我的博客</h1>
+            <img src="assets/logo.svg" alt="博客logo" class="logo">
+            <h1>Trae制作的小博客</h1>
             <a href="admin.html" class="btn btn-primary">管理文章</a>
         </header>
 
@@ -32,21 +34,25 @@
 
             postsContainer.innerHTML = data.posts.map(post => `
                 <article class="post-card">
-                    <h2 class="post-title">
-                        <a href="post.html?id=${post.id}">${post.title}</a>
-                    </h2>
-                    <div class="post-meta">
-                        <span>发布于 ${utils.formatDate(post.date)}</span>
-                        ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
-                    </div>
-                    <div class="post-excerpt">
-                        ${post.content.substring(0, 200)}${post.content.length > 200 ? '...' : ''}
-                    </div>
-                    ${post.tags ? `
-                        <div class="post-tags">
-                            ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                    <img src="${post.cover || 'assets/default-cover.svg'}" alt="${post.title}" class="post-cover">
+                    <div class="post-content">
+                        <h2 class="post-title">
+                            <a href="post.html?id=${post.id}">${post.title}</a>
+                        </h2>
+                        <div class="post-meta">
+                            <img src="assets/avatar.svg" alt="作者头像" class="avatar">
+                            <span>发布于 ${utils.formatDate(post.date)}</span>
+                            ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
                         </div>
-                    ` : ''}
+                        <div class="post-excerpt">
+                            ${post.content.substring(0, 200)}${post.content.length > 200 ? '...' : ''}
+                        </div>
+                        ${post.tags ? `
+                            <div class="post-tags">
+                                ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
                 </article>
             `).join('');
         }

@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>博客管理系统</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>博客管理系统</h1>
+            <img src="assets/logo.svg" alt="博客logo" class="logo">
             <a href="index.html" class="btn btn-primary">返回首页</a>
         </header>
 
@@ -21,6 +22,11 @@
                     <div class="form-group">
                         <label for="title">标题</label>
                         <input type="text" id="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cover">封面图片URL（可选）</label>
+                        <input type="text" id="cover" placeholder="输入图片URL或保持空白使用默认封面">
+                        <img id="coverPreview" src="assets/default-cover.svg" alt="封面预览" class="cover-preview">
                     </div>
                     <div class="form-group">
                         <label for="content">内容</label>
@@ -50,8 +56,19 @@
         function resetForm() {
             document.getElementById('postForm').reset();
             document.getElementById('postId').value = '';
+            document.getElementById('coverPreview').src = 'assets/default-cover.svg';
             currentPostId = null;
         }
+
+        // 预览封面图片
+        document.getElementById('cover').addEventListener('input', function(e) {
+            const preview = document.getElementById('coverPreview');
+            preview.src = e.target.value || 'assets/default-cover.svg';
+            preview.onerror = function() {
+                this.src = 'assets/default-cover.svg';
+                utils.showMessage('图片加载失败，将使用默认封面', 'error');
+            };
+        });
 
         // 加载文章到表单
         async function loadPostToForm(postId) {
@@ -59,6 +76,8 @@
             if (post) {
                 document.getElementById('postId').value = post.id;
                 document.getElementById('title').value = post.title;
+                document.getElementById('cover').value = post.cover || '';
+                document.getElementById('coverPreview').src = post.cover || 'assets/default-cover.svg';
                 document.getElementById('content').value = post.content;
                 document.getElementById('tags').value = post.tags ? post.tags.join(',') : '';
                 currentPostId = post.id;
@@ -77,14 +96,18 @@
 
             postsListContainer.innerHTML = data.posts.map(post => `
                 <div class="post-card">
-                    <h3 class="post-title">${post.title}</h3>
-                    <div class="post-meta">
-                        <span>发布于 ${utils.formatDate(post.date)}</span>
-                        ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
-                    </div>
-                    <div class="post-actions">
-                        <button class="btn btn-primary" onclick="loadPostToForm('${post.id}')">编辑</button>
-                        <button class="btn btn-danger" onclick="deletePost('${post.id}')">删除</button>
+                    <img src="${post.cover || 'assets/default-cover.svg'}" alt="${post.title}" class="post-cover">
+                    <div class="post-content">
+                        <h3 class="post-title">${post.title}</h3>
+                        <div class="post-meta">
+                            <img src="assets/avatar.svg" alt="作者头像" class="avatar">
+                            <span>发布于 ${utils.formatDate(post.date)}</span>
+                            ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
+                        </div>
+                        <div class="post-actions">
+                            <button class="btn btn-primary" onclick="loadPostToForm('${post.id}')">编辑</button>
+                            <button class="btn btn-danger" onclick="deletePost('${post.id}')">删除</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -106,6 +129,7 @@
             e.preventDefault();
             const postData = {
                 title: document.getElementById('title').value,
+                cover: document.getElementById('cover').value,
                 content: document.getElementById('content').value,
                 tags: document.getElementById('tags').value
                     .split(',').map(tag => tag.trim())

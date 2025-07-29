@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>文章详情 - 我的博客</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
 </head>
 <body>
     <div class="container">
         <header>
+            <img src="assets/logo.svg" alt="博客logo" class="logo">
             <a href="index.html" class="btn btn-primary">返回首页</a>
         </header>
 
@@ -40,18 +42,22 @@
 
             postContainer.innerHTML = `
                 <article class="post-card">
-                    <h1 class="post-title">${post.title}</h1>
-                    <div class="post-meta">
-                        <span>发布于 ${utils.formatDate(post.date)}</span>
-                        ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
-                    </div>
-                    ${post.tags ? `
-                        <div class="post-tags">
-                            ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                        </div>
-                    ` : ''}
+                    <img src="${post.cover || 'assets/default-cover.svg'}" alt="${post.title}" class="post-cover">
                     <div class="post-content">
-                        ${post.content.split('\n').map(paragraph => `<p>${paragraph}</p>`).join('')}
+                        <h1 class="post-title">${post.title}</h1>
+                        <div class="post-meta">
+                            <img src="assets/avatar.svg" alt="作者头像" class="avatar">
+                            <span>发布于 ${utils.formatDate(post.date)}</span>
+                            ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
+                        </div>
+                        ${post.tags ? `
+                            <div class="post-tags">
+                                ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="post-content">
+                            ${post.content.split('\n').map(paragraph => `<p>${paragraph}</p>`).join('')}
+                        </div>
                     </div>
                 </article>
             `;
