@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客管理系统</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>博客管理系统</h1>
+            <a href="index.html" class="btn btn-primary">返回首页</a>
+        </header>
+
+        <main>
+            <div class="section">
+                <h2>写文章</h2>
+                <form id="postForm" class="form-group">
+                    <input type="hidden" id="postId">
+                    <div class="form-group">
+                        <label for="title">标题</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">内容</label>
+                        <textarea id="content" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="tags">标签（用逗号分隔）</label>
+                        <input type="text" id="tags">
+                    </div>
+                    <button type="submit" class="btn btn-primary">保存文章</button>
+                    <button type="button" class="btn btn-danger" onclick="resetForm()">清空表单</button>
+                </form>
+            </div>
+
+            <div class="section">
+                <h2>文章列表</h2>
+                <div id="posts-list"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let currentPostId = null;
+
+        // 重置表单
+        function resetForm() {
+            document.getElementById('postForm').reset();
+            document.getElementById('postId').value = '';
+            currentPostId = null;
+        }
+
+        // 加载文章到表单
+        async function loadPostToForm(postId) {
+            const post = await postOperations.getPost(postId);
+            if (post) {
+                document.getElementById('postId').value = post.id;
+                document.getElementById('title').value = post.title;
+                document.getElementById('content').value = post.content;
+                document.getElementById('tags').value = post.tags ? post.tags.join(',') : '';
+                currentPostId = post.id;
+            }
+        }
+
+        // 渲染文章列表
+        async function renderPostsList() {
+            const postsListContainer = document.getElementById('posts-list');
+            const data = await utils.loadJsonFile('posts.json');
+
+            if (!data || !data.posts || !data.posts.length) {
+                postsListContainer.innerHTML = '<p>暂无文章</p>';
+                return;
+            }
+
+            postsListContainer.innerHTML = data.posts.map(post => `
+                <div class="post-card">
+                    <h3 class="post-title">${post.title}</h3>
+                    <div class="post-meta">
+                        <span>发布于 ${utils.formatDate(post.date)}</span>
+                        ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn btn-primary" onclick="loadPostToForm('${post.id}')">编辑</button>
+                        <button class="btn btn-danger" onclick="deletePost('${post.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 删除文章
+        async function deletePost(postId) {
+            if (confirm('确定要删除这篇文章吗？')) {
+                const success = await postOperations.deletePost(postId);
+                if (success) {
+                    utils.showMessage('文章已删除');
+                    renderPostsList();
+                }
+            }
+        }
+
+        // 处理表单提交
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const postData = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value,
+                tags: document.getElementById('tags').value
+                    .split(',').map(tag => tag.trim())
+                    .filter(tag => tag !== '')
+            };
+
+            let success;
+            if (currentPostId) {
+                success = await postOperations.updatePost(currentPostId, postData);
+                if (success) utils.showMessage('文章已更新');
+            } else {
+                success = await postOperations.createPost(postData);
+                if (success) utils.showMessage('文章已创建');
+            }
+
+            if (success) {
+                resetForm();
+                renderPostsList();
+            }
+        });
+
+        // 页面加载时渲染文章列表
+        window.addEventListener('load', renderPostsList);
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章详情 - 我的博客</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index.html" class="btn btn-primary">返回首页</a>
+        </header>
+
+        <main id="post-container">
+            <!-- 文章内容将通过JavaScript动态加载 -->
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // 渲染文章详情
+        async function renderPost() {
+            const postContainer = document.getElementById('post-container');
+            const postId = utils.getUrlParam('id');
+
+            if (!postId) {
+                postContainer.innerHTML = '<p>文章不存在</p>';
+                return;
+            }
+
+            const post = await postOperations.getPost(postId);
+
+            if (!post) {
+                postContainer.innerHTML = '<p>文章不存在</p>';
+                return;
+            }
+
+            document.title = `${post.title} - 我的博客`;
+
+            postContainer.innerHTML = `
+                <article class="post-card">
+                    <h1 class="post-title">${post.title}</h1>
+                    <div class="post-meta">
+                        <span>发布于 ${utils.formatDate(post.date)}</span>
+                        ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
+                    </div>
+                    ${post.tags ? `
+                        <div class="post-tags">
+                            ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="post-content">
+                        ${post.content.split('\n').map(paragraph => `<p>${paragraph}</p>`).join('')}
+                    </div>
+                </article>
+            `;
+        }
+
+        // 页面加载时渲染文章
+        window.addEventListener('load', renderPost);
+    </script>
+</body>
+</html>

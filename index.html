@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的博客</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>我的博客</h1>
+            <a href="admin.html" class="btn btn-primary">管理文章</a>
+        </header>
+
+        <main id="posts-container">
+            <!-- 文章列表将通过JavaScript动态加载 -->
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // 渲染文章列表
+        async function renderPosts() {
+            const postsContainer = document.getElementById('posts-container');
+            const data = await utils.loadJsonFile('posts.json');
+
+            if (!data || !data.posts || !data.posts.length) {
+                postsContainer.innerHTML = '<p>暂无文章</p>';
+                return;
+            }
+
+            postsContainer.innerHTML = data.posts.map(post => `
+                <article class="post-card">
+                    <h2 class="post-title">
+                        <a href="post.html?id=${post.id}">${post.title}</a>
+                    </h2>
+                    <div class="post-meta">
+                        <span>发布于 ${utils.formatDate(post.date)}</span>
+                        ${post.lastModified ? `<span> · 更新于 ${utils.formatDate(post.lastModified)}</span>` : ''}
+                    </div>
+                    <div class="post-excerpt">
+                        ${post.content.substring(0, 200)}${post.content.length > 200 ? '...' : ''}
+                    </div>
+                    ${post.tags ? `
+                        <div class="post-tags">
+                            ${post.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </article>
+            `).join('');
+        }
+
+        // 页面加载时渲染文章列表
+        window.addEventListener('load', renderPosts);
+    </script>
+</body>
+</html>
